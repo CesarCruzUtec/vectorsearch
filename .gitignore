@@ -172,3 +172,6 @@ cython_debug/
 closest_matches/
 images/
 test/
+*.ivf
+*.npy
+test.py

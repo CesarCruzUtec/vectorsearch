@@ -7,14 +7,16 @@ import psycopg2
 import numpy as np
 from PIL import Image
 
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
 # Configuración de CLIP
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device)
 
 # Conexión a la base de datos
 conn = psycopg2.connect(
-    dbname="vectorsearch",
-    user="yubi",
+    dbname="postgres",
+    user="postgres",
     password="",
     host="localhost",
 )
@@ -101,6 +103,7 @@ def eliminar_todos_los_embeddings():
 def cargar_embeddings_a_faiss():
     cur.execute("SELECT id, embedding FROM imagenes")
     datos = cur.fetchall()
+    print("LOG: Datos obtenidos de la DB")
 
     ids_faiss = []
     embeddings = []
@@ -108,12 +111,14 @@ def cargar_embeddings_a_faiss():
     for row in datos:
         ids_faiss.append(row[0])
         embeddings.append(np.array(row[1], dtype="float32"))
+    print("LOG: Arrays creados")
 
     # Crear un índice IVFFlat
-    index = faiss.IndexIVFFlat(faiss.IndexFlatL2(EMBEDDING_DIM), EMBEDDING_DIM, 100)
+    # index = faiss.IndexIVFFlat(faiss.IndexFlatL2(EMBEDDING_DIM), EMBEDDING_DIM, 72)
+    index = faiss.IndexFlatL2(EMBEDDING_DIM)
     if embeddings:
         embeddings_array = np.vstack(embeddings)
-        index.train(embeddings_array)  # Entrenar el índice
+        # index.train(embeddings_array)  # Entrenar el índice
         index.add(embeddings_array)  # Añadir embeddings al índice
     print(f"Índice FAISS creado con {len(ids_faiss)} embeddings.")
 
@@ -200,6 +205,21 @@ def buscar_con_faiss(ruta_imagen, k=5):
             "SELECT id, nombre FROM imagenes WHERE id = ANY(%s)", (ids_encontrados,)
         )
         metadatos = {row[0]: row[1] for row in cur.fetchall()}
+
+        # Copy and rename images to the output folder
+        for id_result, distance in resultados:
+            if id_result in metadatos:
+                nombre_archivo = metadatos[id_result]
+                nuevo_nombre = f"{distance:.4f}-{nombre_archivo}"
+                ruta_origen = os.path.join("images", nombre_archivo)
+                ruta_destino = os.path.join(OUTPUT_DIR, nuevo_nombre)
+
+                if os.path.exists(ruta_origen):
+                    shutil.copy(ruta_origen, ruta_destino)
+                else:
+                    print(f"Advertencia: La imagen {ruta_origen} no existe.")
+
+        # Return results with similarity and filenames
         return [(metadatos[r[0]], r[1]) for r in resultados]
     return []
 
