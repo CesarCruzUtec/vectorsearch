@@ -1,0 +1,5 @@
+- Implementar busqueda semántica de imagenes
+
+- Creacion de embedding 
+- Busqueda contra archivo FAISS
+- Generacion de FAISS cada 24hrs
