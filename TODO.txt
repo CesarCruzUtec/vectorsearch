@@ -3,3 +3,8 @@
 - Creacion de embedding 
 - Busqueda contra archivo FAISS
 - Generacion de FAISS cada 24hrs
+
+
+- pruebas busqueda imagen todos los modelos
+- busqueda texto con openai
+- creacion de db para texto
