@@ -11,8 +11,6 @@ if os.name == "nt":
     os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Parámetros
-OUTPUT_DIR = "./image_search/closest_matches"
-
 model = None
 preprocess = None
 model_name: str = None
@@ -20,6 +18,7 @@ model_dim: int = None
 model_id: int = None
 index_file: str = None
 ids_file: str = None
+output_dir: str = None
 
 MODELOS = {
     "RN50": {"name": "RN50", "dim": 1024, "id": 1},
@@ -59,7 +58,15 @@ def connect(func):
 
 
 def cargar_modelo_clip(modelo="ViT-B/32"):
-    global model, preprocess, model_dim, model_name, index_file, ids_file, model_id
+    global \
+        model, \
+        preprocess, \
+        model_dim, \
+        model_name, \
+        index_file, \
+        ids_file, \
+        model_id, \
+        output_dir
 
     if modelo not in MODELOS:
         print(f"El modelo {modelo} no está disponible.")
@@ -75,6 +82,9 @@ def cargar_modelo_clip(modelo="ViT-B/32"):
 
     index_file = os.path.join(model_folder, "index.faiss")
     ids_file = os.path.join(model_folder, "ids.npy")
+
+    output_dir = os.path.join("./image_search/output", model_name)
+    os.makedirs(output_dir, exist_ok=True)
 
     print(f"Modelo {modelo} cargado.")
 
@@ -309,9 +319,9 @@ def buscar_con_faiss(cur, ruta_imagen, k=5):
     index, ids_faiss = cargar_faiss_desde_disco()
 
     # Directorio para guardar las imágenes similares
-    if os.path.exists(OUTPUT_DIR):
-        shutil.rmtree(OUTPUT_DIR)  # Limpiar la carpeta antes de copiar
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)  # Limpiar la carpeta antes de copiar
+    os.makedirs(output_dir, exist_ok=True)
 
     # Imagen de consulta
     imagen = Image.open(ruta_imagen)
@@ -344,8 +354,8 @@ def buscar_con_faiss(cur, ruta_imagen, k=5):
             if id_result in metadatos:
                 nombre_archivo = metadatos[id_result]
                 nuevo_nombre = f"{distance:.4f}-{nombre_archivo}"
-                ruta_origen = os.path.join("images", nombre_archivo)
-                ruta_destino = os.path.join(OUTPUT_DIR, nuevo_nombre)
+                ruta_origen = os.path.join("./image_search/images", nombre_archivo)
+                ruta_destino = os.path.join(output_dir, nuevo_nombre)
 
                 if os.path.exists(ruta_origen):
                     shutil.copy(ruta_origen, ruta_destino)

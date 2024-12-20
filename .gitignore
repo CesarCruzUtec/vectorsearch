@@ -173,6 +173,7 @@ closest_matches/
 images/
 test/
 models/
+output/
 test.py
 *.xlsx
 *.csv
