@@ -113,7 +113,7 @@ def crear_tabla_imagenes(cur):
             cur.execute(
                 f"""
                 ALTER TABLE imagenes 
-                ADD COLUMN IF NOT EXISTS {model_name} FLOAT[{model_dim}]
+                ADD COLUMN IF NOT EXISTS {modelo["name"]} FLOAT[{modelo["dim"]}]
                 """
             )
 

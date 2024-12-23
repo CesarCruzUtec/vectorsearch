@@ -178,3 +178,4 @@ test.py
 *.xlsx
 *.csv
 *.npy
+*.ipynb
