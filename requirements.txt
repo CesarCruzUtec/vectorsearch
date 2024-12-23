@@ -1,4 +1,10 @@
 torch
 psycopg2
 faiss-cpu
+matplotlib
+rich
+pandas
+openai
+sentence_transformers
+beautifulsoup4
 git+https://github.com/openai/CLIP.git
