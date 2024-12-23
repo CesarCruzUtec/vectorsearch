@@ -178,4 +178,5 @@ test.py
 *.xlsx
 *.csv
 *.npy
-*.ipynb
+*.faiss
+*.jsonl

@@ -7,4 +7,6 @@ pandas
 openai
 sentence_transformers
 beautifulsoup4
+openpyxl
+tiktoken
 git+https://github.com/openai/CLIP.git

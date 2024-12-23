@@ -1,5 +1,5 @@
 import psycopg2
-from openai import OpenAI
+# from openai import OpenAI
 import pandas as pd
 import os
 
