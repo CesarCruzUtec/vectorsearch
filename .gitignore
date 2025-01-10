@@ -180,3 +180,5 @@ test.py
 *.npy
 *.faiss
 *.jsonl
+jobs.txt
+batch_ids.txt
